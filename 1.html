@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agentic AI Curriculum Designer - 5 Page SPA</title>
+    <style>
+        /* CSS for Blue and Black Theme */
+        :root {
+            --background-dark: #1a1a2e;
+            --background-light: #2c3e50;
+            --text-light: #ecf0f1;
+            --accent-blue: #3498db;
+            --accent-hover: #2980b9;
+            --card-background: #1e2738;
+            --table-border-color: #5d9cec;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1200px;
+            margin: 20px auto 10px auto;
+            padding: 20px;
+            background-color: var(--background-light);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- View Management (SPA Simulation) --- */
+        .page-view {
+            display: none; /* All pages hidden by default */
+            padding: 20px 0;
+            min-height: 60vh;
+            flex-direction: column;
+        }
+        
+        /* --- General Layout & Typography --- */
+        h1, h2 {
+            color: var(--accent-blue);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            border-bottom: 1px dashed var(--accent-blue);
+            padding-bottom: 8px;
+            margin-top: 30px;
+        }
+        .intro-text { text-align: center; color: #aaa; margin-bottom: 30px; }
+
+        .form-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-column {
+            padding: 15px;
+            background-color: var(--card-background);
+            border-radius: 8px;
+            border: 1px solid var(--accent-blue);
+        }
+
+        /* Input & Button Styles */
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: var(--text-light); font-size: 0.95em; }
+        input[type="text"], textarea, select {
+            width: 100%; padding: 10px; border: 1px solid #444; border-radius: 5px; box-sizing: border-box;
+            background-color: #2a344a; color: var(--text-light); font-size: 15px; resize: vertical;
+        }
+        button {
+            display: block; width: 100%; padding: 12px; border: none; border-radius: 5px;
+            background-color: var(--accent-blue); color: var(--text-light); font-size: 16px;
+            font-weight: bold; cursor: pointer; transition: background-color 0.3s ease; margin-top: 10px;
+        }
+        .nav-btn-small { width: auto; margin: 5px; padding: 8px 15px; display: inline-block; }
+        button:hover:not(:disabled) { background-color: var(--accent-hover); }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+
+        /* --- Output Formatting (Structure and Tables) --- */
+        .output-content {
+            min-height: 50vh;
+            max-height: 80vh;
+            overflow-y: auto;
+            background-color: #1a1a2e;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 0.95em;
+        }
+        
+        /* Table Styling (APPLIED CSS) */
+        .output-content table {
+            width: 100%; border-collapse: collapse; margin: 15px 0; color: var(--text-light); border: 1px solid var(--table-border-color);
+        }
+        .output-content th, .output-content td {
+            border: 1px solid var(--table-border-color); padding: 10px 8px; text-align: left; vertical-align: top;
+        }
+        .output-content th {
+            background-color: var(--accent-blue); color: var(--background-dark); font-weight: bold; text-transform: uppercase;
+        }
+        .output-content tr:nth-child(even) { background-color: #242c43; }
+        
+        /* Code Block Styling */
+        .output-content pre {
+            background-color: #3e4c60; padding: 15px; border-radius: 3px; font-family: monospace; white-space: pre-wrap; margin-top: 10px; border: 1px solid #444; overflow-x: auto;
+        }
+        
+        /* History & Feedback Styles */
+        #feedbackHistoryContainer { min-height: 150px; background-color: #1a1a2e; padding: 15px; border-radius: 5px; overflow-y: auto; }
+        .feedback-item { border-bottom: 1px dashed #444; padding-bottom: 10px; margin-bottom: 10px; }
+        .feedback-item:last-child { border-bottom: none; }
+        .feedback-item strong { color: var(--accent-blue); display: block; margin-bottom: 5px; }
+
+        /* Loading/Spinner View */
+        #loading-page {
+            flex-direction: column; align-items: center; justify-content: center; text-align: center; font-size: 1.5em;
+        }
+        .loading-spinner {
+            border: 6px solid rgba(255, 255, 255, 0.2); border-top: 6px solid var(--accent-blue);
+            border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 30px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Copyright Footer */
+        .footer {
+            width: 95%; max-width: 1200px; margin-top: 10px; padding: 10px 0;
+            text-align: center; font-size: 0.8em; color: #7f8c8d; border-top: 1px solid #34495e;
+        }
+        .footer strong { color: var(--accent-blue); font-weight: normal; }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) { .form-content { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body onload="showPage('landing-page')">
+
+    <div class="container">
+        <h1>Agentic AI Curriculum Designer 🤖</h1>
+        <p class="intro-text">Navigate the application using the links above.</p>
+
+        <div style="text-align: center; margin-bottom: 20px; border-bottom: 1px solid #34495e; padding-bottom: 10px;">
+            <button class="nav-btn-small" onclick="showPage('landing-page')">🏠 Base Landing Page</button>
+            <button class="nav-btn-small" onclick="showPage('input-page')">✏️ New Design Input</button>
+            <button class="nav-btn-small" onclick="showPage('output-page')">📄 View Last Output</button>
+            <button class="nav-btn-small" onclick="showPage('feedback-page')">💬 Pass Feedback</button>
+            <button class="nav-btn-small" onclick="showPage('history-page')">💾 View History</button>
+        </div>
+
+
+        <div id="landing-page" class="page-view">
+            <h2>Welcome to the Agentic AI Curriculum Designer</h2>
+            <div class="form-content" style="text-align: center; max-width: 800px; margin: 0 auto;">
+                <p>This tool leverages the **Gemini API** to rapidly synthesize a comprehensive, industry-relevant training program based on your specified topic and audience.</p>
+                <p>Use the navigation above or the buttons below to get started:</p>
+                <button onclick="showPage('input-page')">Start a New Curriculum Design</button>
+                <button onclick="showPage('history-page')">View Saved Feedback History</button>
+            </div>
+        </div>
+        
+        <div id="input-page" class="page-view">
+            <h2>Start New Design</h2>
+            <div class="form-content">
+                <div class="form-column">
+                    <h3>Course Parameters</h3>
+                    <div class="input-group">
+                        <label for="topic">Target Subject/Topic:</label>
+                        <input type="text" id="topic" value="Prompt Engineering for LLM Agents" required>
+                    </div>
+    
+                    <div class="input-group">
+                        <label for="level">Target Audience/Level:</label>
+                        <select id="level" required>
+                            <option value="Introductory (101)">Introductory (101)</option>
+                            <option value="Advanced (Professional)" selected>Advanced (Professional)</option>
+                            <option value="University (Undergrad)">University (Undergrad)</option>
+                        </select>
+                    </div>
+    
+                    <div class="input-group">
+                        <label for="demands">Industry Demands/Keywords:</label>
+                        <textarea id="demands" rows="3" placeholder="e.g., Function Calling, Chain of Thought, RAG, Security/Jailbreaking, Tool Use in Agents"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-column">
+                    <h3>Program Features</h3>
+                    <p style="color: #ccc; font-size: 0.95em;">Your custom program will include these structured outputs:</p>
+                    <ul style="list-style-type: '✅ '; padding-left: 20px; font-size: 0.95em;">
+                        <li>**Curriculum Outline** (Styled Table)</li>
+                        <li>**Weekly Study Plan** (Styled Table)</li>
+                        <li>**Subject Experts** & Sample Mail</li>
+                        <li>**Recommended Resources**</li>
+                    </ul>
+                    <button id="startButton" onclick="startGeneration()">
+                        GENERATE PROGRAM
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="loading-page" class="page-view">
+            <div class="loading-spinner"></div>
+            <p id="loading-message">AI Agent is performing deep research and synthesizing your custom curriculum...</p>
+        </div>
+
+        <div id="output-page" class="page-view">
+            <h2>Curriculum Design Result</h2>
+            <div id="outputContent" class="output-content">No output generated yet. Please navigate to 'New Design Input' to run the program.</div>
+
+            <hr style="border-top: 1px solid #444; margin: 30px 0;">
+            
+            <div style="text-align: center;">
+                <button class="nav-btn-small" onclick="showPage('input-page')">
+                    &larr; Start New Design
+                </button>
+                <button class="nav-btn-small" onclick="showPage('feedback-page')">
+                    Pass Feedback &rarr;
+                </button>
+            </div>
+        </div>
+        
+        <div id="feedback-page" class="page-view">
+            <h2>Submit Feedback on Last Result</h2>
+            <div class="form-content">
+                <div class="form-column">
+                    <h3>Last Generated Topic: <span id="last-topic" style="color: var(--accent-blue);">N/A</span></h3>
+                    <div class="input-group">
+                        <label for="feedback">Your Feedback:</label>
+                        <textarea id="feedback" rows="5" placeholder="Critique the tables, strategy, or resources generated by the AI..."></textarea>
+                    </div>
+                    <button id="saveFeedbackButton" onclick="saveFeedbackAndNavigate()">
+                        SAVE FEEDBACK & START NEW DESIGN
+                    </button>
+                </div>
+                
+                <div class="form-column">
+                    <h3>Quick Look: Saved History</h3>
+                    <div id="feedbackContainer" class="output-content" style="max-height: 250px; padding: 10px;">No saved history to display.</div>
+                    <button onclick="showPage('history-page')" style="margin-top: 20px;">
+                        VIEW FULL HISTORY PAGE
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="history-page" class="page-view">
+            <h2>💾 Saved Feedback History</h2>
+            <p style="color: #aaa; text-align: center;">All submitted feedback and the context of the generated program are stored locally in your browser.</p>
+            <div id="feedbackHistoryContainer" class="output-content">Loading history...</div>
+            <button onclick="showPage('input-page')" style="width: 250px; margin: 30px auto 0 auto;">
+                &larr; Back to Designer Input
+            </button>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        &copy; 2025. Designed and Developed by <strong>Akuthota Venkata Bhargavi</strong>.
+    </footer>
+
+    <script>
+        // --- JAVASCRIPT LOGIC ---
+
+        const GEMINI_API_KEY = "AIzaSyCfVg7pa8wq3K4cQDZwMQZYZDSrsF7pcL4"; 
+        const MODEL_ID = "gemini-2.5-flash"; 
+        const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent?key=${GEMINI_API_KEY}`;
+        const STORAGE_KEY = 'curriculumDesignerFeedback';
+        
+        let lastGeneratedTopic = "N/A"; 
+
+        // --- PAGE/VIEW MANAGER ---
+
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-view').forEach(page => {
+                page.style.display = 'none';
+            });
+            // Show the requested page
+            const targetPage = document.getElementById(pageId);
+            targetPage.style.display = 'flex'; 
+
+            // Special handling for views
+            if (pageId === 'feedback-page') {
+                document.getElementById('last-topic').textContent = lastGeneratedTopic;
+                loadFeedbackQuickView();
+            } else if (pageId === 'history-page') {
+                loadFeedbackHistory();
+            }
+        }
+        
+        function startGeneration() {
+            // Step 1: Switch to Loading Page
+            showPage('loading-page');
+            generateCurriculum();
+        }
+
+        // --- CUSTOM MARKDOWN RENDERER (for stable table display) ---
+        function renderMarkdown(markdownText) {
+            let html = markdownText || "";
+
+            // 1. Headings (H1/H2/H3)
+            html = html.replace(/^#\s(.*?)$/gm, '<h3>$1</h3>');
+            
+            // 2. Markdown Tables (CRITICAL FIX: Ensuring multi-line table structure is captured and rendered)
+            // This captures the whole table structure at once, including the header and separator lines.
+            const tableRegex = /^\|.*\|$(?:\r?\n\|[-:]+\|.*\|$(?:\r?\n\|.*\|$)*)*/gm;
+            html = html.replace(tableRegex, (match) => {
+                const lines = match.trim().split('\n');
+                let tableHtml = '<table>';
+                
+                // Process Header (First line)
+                const headerCells = lines[0].split('|').slice(1, -1).map(cell => `<th>${cell.trim()}</th>`).join('');
+                tableHtml += `<thead><tr>${headerCells}</tr></thead><tbody>`;
+
+                // Process Rows (Start from line 2, skipping the separator line (lines[1]))
+                for (let i = 2; i < lines.length; i++) {
+                    const rowCells = lines[i].split('|').slice(1, -1).map(cell => `<td>${cell.trim()}</td>`).join('');
+                    tableHtml += `<tr>${rowCells}</tr>`;
+                }
+                
+                tableHtml += '</tbody></table>';
+                return tableHtml;
+            });
+
+            // 3. Code Blocks (Matches ```content```) - Converts to <pre>
+            html = html.replace(/```(?:[a-zA-Z]*)\n([\s\S]*?)```/gs, '<pre>$1</pre>');
+            
+            // 4. Lists (Markdown bullet points: *)
+            html = html.replace(/^\*\s(.*?)$/gm, '<li>$1</li>');
+            html = html.replace(/((?:<li>.*?<\/li>\s*)+)/gs, '<ul>$1</ul>');
+            
+            // 5. Bold text
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            // 6. Final wrapping (Handle remaining text blocks as paragraphs, ensuring sequential flow)
+            let segments = html.split(/(<h3|<\/table>|<pre>|<ul|<\/ul>)/);
+            let finalHtml = '';
+
+            finalHtml = segments.map((segment, index) => {
+                let s = segment.trim();
+                if (index % 2 === 0) {
+                    if (s) {
+                        // Apply paragraph wrapping to raw text segments
+                        return `<p>${s}</p>`;
+                    }
+                    return '';
+                } else {
+                    // Return HTML tags as they are
+                    return segment;
+                }
+            }).join('');
+            
+            // Clean up: Remove empty paragraphs and redundant <p> tags around block elements
+            finalHtml = finalHtml
+                .replace(/<p><(h3|table|pre|ul)/g, '<$1')
+                .replace(/(<\/h3>|<\/table>|<\/pre>|<\/ul>)<\/p>/g, '$1')
+                .replace(/<p>\s*<\/p>/g, '');
+            
+            return finalHtml;
+        }
+
+
+        // --- CORE API LOGIC ---
+
+        async function generateCurriculum() {
+            const topic = document.getElementById('topic').value;
+            const level = document.getElementById('level').value;
+            const demands = document.getElementById('demands').value;
+            const outputContent = document.getElementById('outputContent');
+            const loadingMessage = document.getElementById('loading-message');
+            
+            lastGeneratedTopic = topic;
+
+            if (!topic) {
+                showPage('input-page'); 
+                alert("Please enter a subject/topic before starting the design process.");
+                return;
+            }
+
+            // 🔑 PROMPT: Includes introductory text first, then structured sections
+            const prompt = `Act as an expert Instructional Designer and Subject Matter Expert. Your goal is to design a comprehensive training program.
+            
+            As an expert Instructional Designer and Subject Matter Expert, I have crafted a comprehensive training program for "${topic}". This program is designed for ${level} professionals seeking to master cutting-edge technologies and research in the field, with a focus on "${demands || 'latest industry practices'}".
+            
+            **Task:** Provide the full program containing the following sections, formatted strictly using Markdown:
+            
+            # Curriculum Outline
+            1. **Format the 5-module course outline as a detailed Markdown Table** with three columns: "Module No.", "Module Title", and "Key Learning Objectives (4-5 per module)".
+            
+            # Weekly Learning Strategy (Study Plan)
+            2. **Provide a 4-week study program as a Markdown Table** with three columns: "Week", "Primary Focus (Module Content)", and "Activities (e.g., Project/Reading)". This is the weekly timetable.
+            
+            # Subject Experts & Paid Class Access
+            3. **List 3 hypothetical Subject Experts** in this field (Title, Specialization, and Sample Email Address). Present this information in a clear Markdown list.
+            4. Provide a professional, **sample email template (in a Markdown code block)** that a student can copy and send to an expert to inquire about paid private classes or consulting.
+            
+            # Recommended Industry Resources
+            5. **Include a list of 3-5 relevant sources** (papers, books, tools, or official documentation) that align with the curriculum, using Markdown bullet points.
+            
+            Ensure the entire output is structured using Markdown.`;
+
+            loadingMessage.textContent = "Synthesizing content and formatting results...";
+
+            try {
+                const response = await fetch(API_ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ role: "user", parts: [{ text: prompt }] }],
+                        generationConfig: { 
+                            temperature: 0.8,
+                            maxOutputTokens: 2048
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    let errorMessage = `API Error: ${response.status}. Response: ${errorText}`;
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage = `API Error: ${response.status} - ${errorData.error.message}`;
+                    } catch (e) { }
+                    throw new Error(errorMessage);
+                }
+
+                const data = await response.json();
+                const curriculumText = data.candidates?.[0]?.content?.parts?.[0]?.text || "NO TEXT GENERATED. CHECK CONSOLE FOR SAFETY/QUOTA ERROR.";
+                
+                // Step 2: Render content and switch to Output Page
+                outputContent.innerHTML = renderMarkdown(curriculumText);
+                showPage('output-page');
+
+            } catch (error) {
+                console.error("Gemini API Call Failed:", error);
+                outputContent.innerHTML = `
+                    <h3 style="color: var(--accent-blue);">❌ Generation Failed</h3>
+                    <p>Details: ${error.message}</p>
+                    <p>The output formatting is now highly stable. This likely indicates a **Safety Block** or **API Key/Quota Issue** on the server side.</p>
+                `;
+                showPage('output-page'); 
+            }
+        }
+
+        // --- FEEDBACK/STORAGE LOGIC ---
+        
+        function saveFeedbackAndNavigate() {
+            const topic = document.getElementById('topic').value;
+            const level = document.getElementById('level').value;
+            const demands = document.getElementById('demands').value;
+            const curriculum = document.getElementById('outputContent').innerText; 
+            const userFeedback = document.getElementById('feedback').value;
+
+            if (!userFeedback) {
+                alert("Please enter some feedback before saving.");
+                return;
+            }
+
+            const newFeedback = {
+                timestamp: new Date().toLocaleString(),
+                topic: lastGeneratedTopic || 'N/A',
+                level: level,
+                demands: demands || 'N/A',
+                curriculum: curriculum.substring(0, 100).replace(/\n/g, ' ') + '...', 
+                feedback: userFeedback
+            };
+
+            const storedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            storedData.unshift(newFeedback);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(storedData.slice(0, 10)));
+            
+            document.getElementById('feedback').value = '';
+            alert("Feedback saved locally! Starting a new design.");
+            showPage('input-page'); 
+        }
+
+        function loadFeedbackQuickView() {
+            // Loads quick view for the feedback submission page
+            const feedbackContainer = document.getElementById('feedbackContainer');
+            const storedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+            if (storedData.length === 0) {
+                feedbackContainer.innerHTML = "<p style='text-align: center; color: #999;'>No history available.</p>";
+                return;
+            }
+
+            // Display only a short summary of the last few feedbacks
+            feedbackContainer.innerHTML = storedData.slice(0, 3).map(item => `
+                <div class="feedback-item">
+                    <strong style="font-size: 0.9em;">${item.timestamp}</strong>
+                    <p style="margin: 0; font-size: 0.8em;">${item.feedback.substring(0, 50)}...</p>
+                </div>
+            `).join('');
+        }
+
+        function loadFeedbackHistory() {
+            // Loads full history for the dedicated HISTORY page
+            const historyContainer = document.getElementById('feedbackHistoryContainer');
+            const storedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            
+            if (storedData.length === 0) {
+                historyContainer.innerHTML = "<p style='text-align: center; color: #999; margin-top: 50px;'>No history available yet.</p>";
+                return;
+            }
+
+            historyContainer.innerHTML = storedData.map(item => `
+                <div class="feedback-item" style="border: 1px solid #3e4c60; padding: 10px; margin-bottom: 15px; border-radius: 5px; background-color: #242c43;">
+                    <strong style="display: block; color: var(--accent-blue); margin-bottom: 5px;">${item.timestamp} - Topic: ${item.topic} (${item.level})</strong>
+                    <p style="margin: 0 0 5px 0; font-size: 0.9em;">**User Feedback:** ${item.feedback}</p>
+                    <p style="margin: 0; font-size: 0.75em; color: #7f8c8d;">*Curriculum Snippet:* ${item.curriculum}</p>
+                </div>
+            `).join('');
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+             showPage('landing-page');
+        });
+    </script>
+
+</body>
+</html>
